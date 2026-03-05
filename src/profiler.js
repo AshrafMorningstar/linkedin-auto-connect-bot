@@ -113,6 +113,16 @@ async function scorePersonCard(card) {
             }
         }
 
+        // ── Target Professions from config ──────────────────────────
+        if (config.highProfile && config.highProfile.targetProfessions) {
+            for (const prof of config.highProfile.targetProfessions) {
+                if (textUpper.includes(prof.toUpperCase())) {
+                    score += 20;
+                    reasons.push(`Pref. Profession: "${prof}"`);
+                }
+            }
+        }
+
     } catch (err) {
         // If we can't read the card, give neutral score
         return { score: 0, reasons: ['Could not read card'] };

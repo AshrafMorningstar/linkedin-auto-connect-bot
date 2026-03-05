@@ -139,6 +139,14 @@ const config = {
       'https://www.linkedin.com/search/results/people/?keywords=LinkedIn+Top+Voice+Influencer&origin=GLOBAL_SEARCH_HEADER',
     ],
     customKeywords: ['Entrepreneur', 'Startup', 'Growth Hacker', 'Product Leader'],
+
+    // Target specific professions (e.g. 'IT Professional', 'CA', 'Chartered Accountant')
+    targetProfessions: [
+      'IT Professional', 'Software Engineer', 'Developer',
+      'Chartered Accountant', 'CA', 'Finance Professional',
+      'Sales Manager', 'HR Professional', 'Data Scientist'
+    ],
+
     useTargetProfiles: false,
     targetProfiles: [],
   },

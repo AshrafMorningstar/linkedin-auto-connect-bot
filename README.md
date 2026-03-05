@@ -138,6 +138,7 @@ The bot **automatically prioritizes** high-value connections:
 ```
 CEO / Founder / President / Investor    →  +30 points
 CTO / VP / Director / Head of          →  +20 points
+Targeted Profession (IT, CA, etc.)      →  +20 points
 Senior / Manager / Advisor / Speaker   →  +10 points
 500+ connections badge                  →  +25 points
 10,000+ followers                       →  +30 points
