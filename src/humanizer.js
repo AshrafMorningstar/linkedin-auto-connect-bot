@@ -77,10 +77,18 @@ async function humanHover(page, element) {
 }
 
 /**
- * Simulate a human-like page load wait (random within range).
+ * Wait for a random amount of time and perform natural actions to simulate profile viewing.
  */
-async function waitForPageLoad() {
-    await randomDelay(config.delays.pageLoadMin, config.delays.pageLoadMax);
+async function humanViewProfile(page) {
+    const viewDuration = Math.floor(Math.random() * 8000) + 7000;
+    const startTime = Date.now();
+    logger.info(`  👁  Viewing profile for ${(viewDuration / 1000).toFixed(1)}s...`);
+
+    while (Date.now() - startTime < viewDuration) {
+        if (Math.random() > 0.6) await humanScroll(page);
+        if (Math.random() > 0.7) await randomMouseMove(page);
+        await new Promise(r => setTimeout(r, 2000));
+    }
 }
 
 module.exports = {
@@ -90,4 +98,5 @@ module.exports = {
     randomMouseMove,
     humanHover,
     waitForPageLoad,
+    humanViewProfile,
 };

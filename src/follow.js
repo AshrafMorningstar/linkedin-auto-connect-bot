@@ -1,35 +1,32 @@
 /**
- * follow.js — Auto-follow people on LinkedIn
- *
- * Strategy:
- * 1. Navigate to a search results page (configurable)
- * 2. Find all "Follow" buttons
- * 3. Click each with human-like delays
- * 4. Stop after maxFollows limit
+ * follow.js — Auto-follow people on LinkedIn (2026 Edition)
  */
 require('dotenv').config();
 const config = require('../config');
 const logger = require('./logger');
-const { randomDelay, humanScroll, humanHover, randomMouseMove, waitForPageLoad } = require('./humanizer');
+const { randomDelay, humanScroll, humanHover, randomMouseMove, waitForPageLoad, humanViewProfile } = require('./humanizer');
 const { filterHighProfile } = require('./profiler');
+const { isWorkTime, getTargetLimit } = require('./scheduler');
 
 const SELECTORS = {
-    // Follow buttons in search results / profile pages
     followBtn: 'button[aria-label*="Follow"]',
-
-    // "Show more" to load more results
     showMoreBtn: '.scaffold-finite-scroll__load-button',
 };
 
 /**
  * Run auto-follow session
- * @param {Page} page - Puppeteer page
- * @returns {number} - Number of follows completed
  */
 async function autoFollow(page) {
     logger.divider();
     logger.action('Starting AUTO-FOLLOW session...');
-    logger.info(`Limit: ${config.maxFollows} follows this session.`);
+
+    if (!isWorkTime()) {
+        logger.warn("Stopping follow session: Outside working hours.");
+        return 0;
+    }
+
+    const sessionLimit = getTargetLimit(config.maxFollows, 'follow');
+    logger.info(`Limit: ${sessionLimit} follows this session.`);
 
     let startUrl;
     if (config.highProfile && config.highProfile.enabled) {
@@ -49,113 +46,66 @@ async function autoFollow(page) {
     await waitForPageLoad();
 
     let followCount = 0;
-    let noButtonRounds = 0;
-    const MAX_NO_BUTTON_ROUNDS = 3;
+    while (followCount < sessionLimit) {
+        if (!isWorkTime()) break;
 
-    while (followCount < config.maxFollows) {
-        // Natural browsing behavior
         await randomMouseMove(page);
         await humanScroll(page);
 
-        // Find visible Follow buttons
         const buttons = await page.$$(SELECTORS.followBtn);
+        if (buttons.length === 0) break;
 
-        if (buttons.length === 0) {
-            noButtonRounds++;
-            logger.warn(`No Follow buttons found (attempt ${noButtonRounds}/${MAX_NO_BUTTON_ROUNDS}). Scrolling...`);
-
-            if (noButtonRounds >= MAX_NO_BUTTON_ROUNDS) {
-                const showMore = await page.$(SELECTORS.showMoreBtn);
-                if (showMore) {
-                    logger.info('Clicking "Show more results"...');
-                    await humanHover(page, showMore);
-                    await showMore.click();
-                    await waitForPageLoad();
-                    noButtonRounds = 0;
-                } else {
-                    logger.warn('No more results to load. Ending follow session.');
-                    break;
+        let cardMap = new Map();
+        const cards = [];
+        for (const btn of buttons) {
+            const card = await btn.evaluateHandle(el => {
+                let node = el;
+                for (let i = 0; i < 6; i++) {
+                    node = node.parentElement;
+                    if (node && (node.tagName === 'LI' || node.tagName === 'ARTICLE')) return node;
                 }
-            }
-            continue;
-        }
-
-        noButtonRounds = 0;
-
-        // ── High-Profile Filtering ────────────────────────────────
-        let orderedButtons = buttons;
-        if (config.highProfile && config.highProfile.enabled) {
-            const cards = [];
-            for (const btn of buttons) {
-                const card = await btn.evaluateHandle(el => {
-                    let node = el;
-                    for (let i = 0; i < 6; i++) {
-                        node = node.parentElement;
-                        if (node && (node.tagName === 'LI' || node.tagName === 'ARTICLE')) return node;
-                    }
-                    return el;
-                });
-                cards.push(card.asElement() || btn);
-            }
-            const filteredCards = await filterHighProfile(cards, config.highProfile.minScore);
-            orderedButtons = [];
-            for (const card of filteredCards) {
-                const btn = await card.$('button[aria-label*="Follow"]').catch(() => null);
-                if (btn) orderedButtons.push(btn);
-            }
-            if (orderedButtons.length === 0) {
-                logger.warn('No high-profile people to follow on this page — scrolling...');
-                await humanScroll(page);
-                await randomDelay(config.delays.actionMin, config.delays.actionMax);
-                continue;
+                return el;
+            });
+            const cardEl = card.asElement();
+            if (cardEl) {
+                cards.push(cardEl);
+                cardMap.set(cardEl, btn);
             }
         }
 
-        logger.info(`Following ${orderedButtons.length} high-profile candidate(s) on screen.`);
+        const filteredCards = await filterHighProfile(cards, config.highProfile.minScore);
 
-        for (const button of orderedButtons) {
-            if (followCount >= config.maxFollows) {
-                logger.limit(`Follow limit reached: ${config.maxFollows}. Stopping.`);
-                return followCount;
-            }
+        for (const cardEl of filteredCards) {
+            if (followCount >= sessionLimit) break;
+            const button = cardMap.get(cardEl);
 
             try {
-                // Skip if this button text is already "Following"
-                const btnText = await button.evaluate(el =>
-                    el.getAttribute('aria-label') || el.innerText || ''
-                );
+                const btnText = await button.evaluate(el => el.getAttribute('aria-label') || el.innerText || '');
                 if (btnText.toLowerCase().includes('following') || btnText.toLowerCase().includes('unfollow')) {
-                    logger.info(`  Skipping already-followed person.`);
                     continue;
                 }
 
-                await humanHover(page, button);
+                await humanHover(page, cardEl);
+                if (Math.random() > 0.5) await humanViewProfile(page);
 
+                await humanHover(page, button);
                 const isVisible = await button.isIntersectingViewport().catch(() => false);
                 if (!isVisible) continue;
 
-                logger.action(`Clicking Follow: "${btnText.trim()}"`);
+                logger.action(`Clicking Follow...`);
                 await button.click();
-
                 await randomDelay(config.delays.actionMin, config.delays.actionMax);
 
                 followCount++;
-                logger.success(`Followed! [${followCount}/${config.maxFollows}]`);
+                logger.success(`Followed! [${followCount}/${sessionLimit}]`);
 
-                // Occasional long pause to simulate real behavior
-                if (Math.random() < 0.15) {
-                    const longBreak = Math.floor(Math.random() * 12000) + 6000;
-                    logger.info(`  💭 Natural pause (${(longBreak / 1000).toFixed(0)}s)...`);
-                    await new Promise(r => setTimeout(r, longBreak));
-                }
-
+                if (Math.random() < 0.1) await randomDelay(6000, 12000);
             } catch (err) {
-                logger.error(`Error clicking follow button: ${err.message}`);
+                logger.error(`Error: ${err.message}`);
                 await randomDelay(2000, 4000);
             }
         }
 
-        // Scroll and wait for more results
         await humanScroll(page);
         await randomDelay(config.delays.actionMin, config.delays.actionMax);
     }

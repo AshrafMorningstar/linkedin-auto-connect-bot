@@ -28,15 +28,13 @@
 | Feature | This Bot | Other Bots |
 |---|---|---|
 | **Real Visible Browser** | ✅ Full Chrome window | ❌ Headless / API |
+| **Warm-up Mode** | ✅ Adaptive limit ramping | ❌ Static/Risk limits |
+| **Business Hours** | ✅ 9-to-5 Scheduling | ❌ 24/7 (Bot signal) |
+| **Dynamic Tags** | ✅ {{first_name}}, {{company}} | ❌ Generic text |
+| **Drip Mimicry** | ✅ Pre-Connect profile view | ❌ Direct clicks |
 | **Stealth Mode** | ✅ Puppeteer-Extra Stealth | ❌ Easily detected |
-| **Human-Like Typing** | ✅ Char-by-char with jitter | ❌ Instant paste |
-| **Random Mouse Movement** | ✅ Smooth cursor paths | ❌ Direct clicks |
-| **Smart Delays** | ✅ 5–15s randomized | ❌ Fixed intervals |
-| **High-Profile Targeting** | ✅ CEO/Founder/VP priority | ❌ Random targets |
-| **Profile Scoring Engine** | ✅ Title + Followers + Badges | ❌ Not available |
-| **CAPTCHA Aware** | ✅ Waits for manual solve | ❌ Crashes |
-| **Safety Limits** | ✅ Fully configurable | ❌ Reckless |
-| **Auto Login** | ✅ .env credentials | ❌ Manual login |
+| **High-Profile Targeting**| ✅ CEO/Founder/VP priority | ❌ Random targets |
+| **Profile Scoring** | ✅ Title + Followers + Badges | ❌ Not available |
 
 <br/>
 
@@ -46,32 +44,32 @@
 
 <br/>
 
-## ✨ Features
+## ✨ Pro Features (2026 Edition)
 
 <table>
 <tr>
 <td width="50%">
 
 ### 🕵️ 100% Human-Like Behavior
-Controls a **real, visible Chrome window**. Scrolls, moves the mouse, and types exactly like a human. LinkedIn can't tell the difference.
+Controls a **real, visible Chrome window**. Scrolls, moves the mouse, and views profiles for 10-25s before connecting.
 
 ### 🎯 High-Profile Targeting
-Scores every person by **title**, **follower count**, **500+ badge**, and **LinkedIn Top Voice** status. Connect with **CEOs, Founders, VPs** first.
+Scores every person by **title**, **follower count**, **500+ badge**, and **LinkedIn Top Voice** status.
 
-### 🔑 Secure Auto-Login
-Logs in automatically using credentials from your local `.env` file. **Nothing is ever hardcoded** or transmitted.
+### 🏷️ Dynamic Personalization
+Automatically inserts the person's **{{first_name}}**, **{{company}}**, or **{{title}}** into your connection notes.
 
 </td>
 <td width="50%">
 
-### ⏱️ Randomized Safe Delays
-Waits **5–15 seconds** (randomized) between every action. Occasionally takes longer "human breaks" to check notifications.
+### 📈 Smart Warm-up Mode
+Gradually increases daily limits (e.g., +3 every day) to safely "warm up" your account and avoid flags.
 
-### 🛑 Built-in Safety Limits
-Stops after configurable limits (**50 connects**, **30 follows** by default). Never trips LinkedIn's rate limiters.
+### 📅 Working Hours Scheduler
+Configurable business hours (e.g., 9 AM - 6 PM, Mon-Fri). The bot sleeps when humans sleep.
 
-### 📋 Interactive Menu
-Choose **Auto Connect**, **Auto Follow**, or **Both** from a clean terminal menu. Or pass `--mode=connect` as a CLI flag.
+### 🛑 Multi-Layer Safety
+Randomized delays, CAPTCHA awareness, and session hard-caps keep your account in the "Safe Zone".
 
 </td>
 </tr>

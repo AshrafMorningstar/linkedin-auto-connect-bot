@@ -104,40 +104,44 @@ const config = {
     // Save logs to a file (logs/session.log)
     saveToFile: false,
   },
-  // ─── HIGH-PROFILE TARGETING ──────────────────────────────
-  highProfile: {
-    // Enable high-profile filtering? If false, all people are treated equally.
+  // ─── ADVANCED 2026 FEATURES ─────────────────────────────
+
+  // WARM-UP MODE: Gradually increases activity for new accounts
+  warmUp: {
     enabled: true,
-
-    // Minimum score to connect/follow a person (0 = no filter, 20 = must have a notable title)
-    // Score breakdown: CEO/Founder=30, VP/Director=20, Senior/Manager=10, 500+ connections=25,
-    //                  10k+ followers=30, Top Voice=25
-    minScore: 20,
-
-    // Search URLs specifically targeting high-profile people
-    // These are used when highProfile.enabled = true AND connect.useSearchUrl = false
-    searchUrls: [
-      // CEOs, Founders and Entrepreneurs
-      'https://www.linkedin.com/search/results/people/?keywords=CEO+Founder&origin=GLOBAL_SEARCH_HEADER',
-      // VPs and Directors
-      'https://www.linkedin.com/search/results/people/?keywords=VP+Director+LinkedIn&origin=GLOBAL_SEARCH_HEADER',
-      // LinkedIn Top Voices & Influencers
-      'https://www.linkedin.com/search/results/people/?keywords=LinkedIn+Top+Voice+Influencer&origin=GLOBAL_SEARCH_HEADER',
-    ],
-
-    // Extra custom keywords to boost score (add your niche here!)
-    customKeywords: [
-      'Entrepreneur', 'Startup', 'Growth Hacker', 'Product Leader',
-    ],
-
-    // If true, bot will visit targetProfiles list directly and connect/follow them
-    useTargetProfiles: false,
-
-    // A list of specific LinkedIn profile URLs to target
-    // (only used when useTargetProfiles = true)
-    targetProfiles: [],
+    startLimit: 5,        // Start with 5 actions on Day 1
+    incrementPerDay: 3,   // Add 3 actions to the limit each day
+    maxRampLimit: 40,     // Stop ramping once we hit 40
   },
 
+  // WORKING HOURS: Only run during human business hours
+  schedule: {
+    enabled: true,
+    startHour: 9,         // 9 AM
+    endHour: 18,          // 6 PM
+    days: [1, 2, 3, 4, 5] // Monday - Friday (0=Sun, 6=Sat)
+  },
+
+  // PERSONALIZATION: Dynamic message tags
+  personalization: {
+    // Available tags: {{first_name}}, {{company}}, {{title}}
+    defaultFirstName: "there",
+    defaultCompany: "your company",
+  },
+
+  // ─── HIGH-PROFILE TARGETING ──────────────────────────────
+  highProfile: {
+    enabled: true,
+    minScore: 20,
+    searchUrls: [
+      'https://www.linkedin.com/search/results/people/?keywords=CEO+Founder&origin=GLOBAL_SEARCH_HEADER',
+      'https://www.linkedin.com/search/results/people/?keywords=VP+Director+LinkedIn&origin=GLOBAL_SEARCH_HEADER',
+      'https://www.linkedin.com/search/results/people/?keywords=LinkedIn+Top+Voice+Influencer&origin=GLOBAL_SEARCH_HEADER',
+    ],
+    customKeywords: ['Entrepreneur', 'Startup', 'Growth Hacker', 'Product Leader'],
+    useTargetProfiles: false,
+    targetProfiles: [],
+  },
 };
 
 module.exports = config;

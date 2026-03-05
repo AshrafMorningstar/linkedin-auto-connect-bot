@@ -68,18 +68,26 @@ function printSummary() {
     logger.divider();
 }
 
+const { isWorkTime } = require('./src/scheduler');
+
 /**
  * Main bot runner
  */
 async function main() {
     logger.banner();
 
+    if (!isWorkTime() && cliMode) {
+        logger.error("❌ SCHEDULER: Current time is outside allowed working hours. Bot will not run.");
+        logger.info("Edit config.js -> schedule to change working hours.");
+        process.exit(1);
+    }
+
     // Show configured limits
     logger.info(`Safety Config:`);
     logger.info(`  Max Connects/session : ${config.maxConnections}`);
     logger.info(`  Max Follows/session  : ${config.maxFollows}`);
     logger.info(`  Action delay         : ${config.delays.actionMin / 1000}s – ${config.delays.actionMax / 1000}s`);
-    logger.info(`  Browser mode         : ${config.browser.headless ? 'Headless (⚠ not recommended)' : 'Visible window ✔'}`);
+    logger.info(`  Schedule Enforcement : ${config.schedule.enabled ? 'Enabled' : 'Disabled'}`);
     logger.divider();
 
     // Determine mode from CLI arg or interactive menu
@@ -93,8 +101,10 @@ async function main() {
         process.exit(0);
     }
 
-    if (!['1', '2', '3', 'connect', 'follow', 'both'].includes(choice)) {
-        logger.error(`Invalid choice: "${choice}". Please enter 1, 2, or 3.`);
+    // Check again after menu selection if not already checked
+    if (!isWorkTime()) {
+        logger.error("❌ SCHEDULER: Current time is outside allowed working hours.");
+        logger.info("Edit config.js -> schedule to change working hours.");
         process.exit(1);
     }
 
