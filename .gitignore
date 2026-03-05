@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment — NEVER commit credentials!
+.env
+
+# Puppeteer session / cache
+.local-chromium/
+.cache/
+
+# Screenshots and recordings
+screenshots/
+*.png
+*.mp4
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
