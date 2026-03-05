@@ -142,9 +142,14 @@ const config = {
 
     // Target specific professions (e.g. 'IT Professional', 'CA', 'Chartered Accountant')
     targetProfessions: [
-      'IT Professional', 'Software Engineer', 'Developer',
-      'Chartered Accountant', 'CA', 'Finance Professional',
-      'Sales Manager', 'HR Professional', 'Data Scientist'
+      'IT Professional', 'Software Engineer', 'Developer', 'Full Stack',
+      'Chartered Accountant', 'CA', 'Finance', 'Investment Banker',
+      'Doctor', 'Physician', 'Surgeon', 'Medical Professional',
+      'Advocate', 'Lawyer', 'Legal Advisor',
+      'Architect', 'Civil Engineer', 'Real Estate',
+      'Sales Manager', 'Marketing Specialist', 'Content Creator',
+      'HR Professional', 'Recruiter', 'Talent Acquisition',
+      'Data Scientist', 'AI Specialist'
     ],
 
     useTargetProfiles: false,

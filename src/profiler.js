@@ -123,6 +123,17 @@ async function scorePersonCard(card) {
             }
         }
 
+        // ── Environmental High-Profile Keywords ──────────────────────
+        if (process.env.HIGH_PROFILE_KEYWORDS) {
+            const envKws = process.env.HIGH_PROFILE_KEYWORDS.split(',').map(k => k.trim());
+            for (const kw of envKws) {
+                if (kw && textUpper.includes(kw.toUpperCase())) {
+                    score += 15;
+                    reasons.push(`Env Keyword: "${kw}"`);
+                }
+            }
+        }
+
     } catch (err) {
         // If we can't read the card, give neutral score
         return { score: 0, reasons: ['Could not read card'] };
@@ -154,8 +165,10 @@ async function filterHighProfile(cards, minScore = 0) {
     // Log top profiles found
     const top = scored.slice(0, 5);
     for (const { score, reasons } of top) {
-        if (score > 0) {
-            logger.info(`  ⭐ Score ${score}: ${reasons.join(', ')}`);
+        if (score >= minScore && score > 0) {
+            const hasProf = reasons.some(r => r.includes('Pref. Profession'));
+            const icon = hasProf ? '  💼 ' : '  ⭐ ';
+            logger.info(`${icon}Score ${score}: ${reasons.join(', ')}`);
         }
     }
 
